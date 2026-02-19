@@ -1,10 +1,31 @@
+import fs from "fs";
+import path from "path";
+
+function loadDocuments(): string {
+  try {
+    const filePath = path.join(process.cwd(), "data", "documents.json");
+    if (!fs.existsSync(filePath)) return "";
+    const docs = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return docs.map((d: any) => d.content).join("\n\n---\n\n");
+  } catch {
+    return "";
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { message, hasDocuments } = await req.json();
 
-    const systemPrompt = hasDocuments
-      ? "You are a helpful assistant answering based on provided documentation. If the documentation does not contain the answer, say you do not know."
-      : "You are a helpful and knowledgeable assistant. Answer the user's question clearly and accurately.";
+    const docsContext = hasDocuments ? loadDocuments() : "";
+
+
+  const systemPrompt = hasDocuments
+    ? `You are a helpful assistant answering based ONLY on the documentation below.
+    If the answer is not contained in the documentation, say "I do not know."
+
+Documentation:
+${docsContext}`
+  : "You are a helpful and knowledgeable assistant.";
 
     const response = await fetch("http://localhost:1234/v1/chat/completions", {
       method: "POST",
