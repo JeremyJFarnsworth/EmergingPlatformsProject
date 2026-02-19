@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const [input, setInput] = useState("");
@@ -10,6 +10,26 @@ export default function HomePage() {
 
   const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [hasDocuments, setHasDocuments] = useState(false);
+
+
+  const [connectionStatus, setConnectionStatus] = useState("Checking AI connection...");
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const res = await fetch("/api/health");
+
+        if (!res.ok) throw new Error();
+
+        setConnectionStatus("🟢 AI Connected");
+      } catch {
+        setConnectionStatus("🔴 AI Not Connected");
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   const handleUpload = async () => {
     if (!file) {
@@ -30,6 +50,7 @@ export default function HomePage() {
       if (!res.ok) throw new Error("Upload failed");
 
       setUploadStatus("Document uploaded successfully.");
+      setHasDocuments(true);
       setFile(null);
     } catch {
       setUploadStatus("Upload failed. Please try again.");
@@ -56,7 +77,10 @@ export default function HomePage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({
+          message: input,
+          hasDocuments: hasDocuments
+        }),
       });
 
       if (!res.ok) throw new Error("API request failed");
@@ -96,6 +120,10 @@ export default function HomePage() {
         >
           ✧ RAG Pipeline Assistant ✧
         </h1>
+        <p className="text-center text-sm text-gray-500 mb-4">
+          {connectionStatus}
+        </p>
+
 
         {/* Upload Section */}
         <div className="mb-10 p-6 rounded-2xl
