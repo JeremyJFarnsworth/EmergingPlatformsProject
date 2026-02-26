@@ -1,7 +1,3 @@
 [
-  {
-    "id": "b8377255-e52f-4e27-820f-55e28fec0023",
-    "filename": "AICoachNotes.txt",
-    "content": "Anderson Bode, Alejandro Beaton, Xavier Carbaugh, Cathel Holden, Landon Miura (C+), Carter Olsen (C+), Thomas Osteen\r\nDrop out? Tristan Branham, Anthony Marks, Ivan Marquez\r\n\r\nVirtual machine - $.25 an hour\r\n\r\nCompute instance - shut down after an hour - Create after no other changes\r\n\r\nSample data drop down automobile price\r\n\r\nRight click on data - preview data (x-everything else y-price)\r\n\r\nSplit Data - double click - .5 -> .7 - 70 percent of the data is training data, 30 is test Random seed - 24 close split data\r\n\r\nTrain Model - Results data to dataset - Linear regression model plugged into other train model input - double click on train model - Label is target variable - edit column give column name of price \r\n \r\nScore model - trainded model in one slot, test data in the other slot\r\n\r\nName it RegressionModel \r\n\r\nCompute resource check to see if its online then click on submit\r\n\r\nNew experiment - (name) - auto price prediction - Next - Next - Compute Instance - should see your running compute instance - refresh if you dont might fix it - Next - Submit \r\n\r\n- View details on top after 10 to 15 seconds or go to job page\r\n\r\n- Clean Missing Data - delete link between data and split and insert the cleaning step. double click select the columns to clean (normalized losses) - Cleaning mode (replace with mean) \r\n\r\nEvaluate Model put it at the end - submit"
-  }
+  
 ]
