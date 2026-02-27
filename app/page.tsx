@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function HomePage() {
   const [input, setInput] = useState("");
@@ -12,16 +12,16 @@ export default function HomePage() {
   const [uploadStatus, setUploadStatus] = useState("");
   const [hasDocuments, setHasDocuments] = useState(false);
 
+  const [connectionStatus, setConnectionStatus] =
+    useState("Checking AI connection...");
 
-  const [connectionStatus, setConnectionStatus] = useState("Checking AI connection...");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const checkConnection = async () => {
       try {
         const res = await fetch("/api/health");
-
         if (!res.ok) throw new Error();
-
         setConnectionStatus("🟢 AI Connected");
       } catch {
         setConnectionStatus("🔴 AI Not Connected");
@@ -65,11 +65,6 @@ export default function HomePage() {
       return;
     }
 
-    if (input.length > 2000) {
-      setError("Input is too long. Please keep it under 2000 characters.");
-      return;
-    }
-
     try {
       setLoading(true);
       setResponse("");
@@ -79,7 +74,7 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: input,
-          hasDocuments: hasDocuments
+          hasDocuments,
         }),
       });
 
@@ -95,57 +90,71 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6
-      bg-gradient-to-br from-white via-slate-100 to-gray-200
-      relative overflow-hidden"
+    <main
+      className="
+        min-h-screen flex items-center justify-center px-6
+        bg-gradient-to-br from-white via-slate-100 to-gray-200
+        relative overflow-hidden
+      "
     >
-      {/* subtle shine overlay */}
       <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-white/30 pointer-events-none" />
 
-      <div className="
-        backdrop-blur-xl
-        bg-white/60
-        border border-white/70
-        shadow-[0_0_40px_rgba(255,255,255,0.6)]
-        rounded-3xl
-        p-10
-        w-full
-        max-w-2xl
-        relative
-      ">
-
-        <h1 className="text-3xl font-bold text-center mb-8
-          bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700
-          bg-clip-text text-transparent"
+      <div
+        className="
+          backdrop-blur-xl
+          bg-white/60
+          border border-white/70
+          shadow-[0_0_40px_rgba(255,255,255,0.6)]
+          rounded-3xl
+          p-10
+          w-full
+          max-w-2xl
+          relative
+        "
+      >
+        <h1
+          className="
+            text-3xl font-bold text-center mb-8
+            bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700
+            bg-clip-text text-transparent
+          "
         >
           ✧ RAG Pipeline Assistant ✧
         </h1>
+
         <p className="text-center text-sm text-gray-500 mb-4">
           {connectionStatus}
         </p>
 
-
         {/* Upload Section */}
-        <div className="mb-10 p-6 rounded-2xl
-          bg-white/70
-          border border-white/80
-          shadow-inner"
+        <div
+          className="
+            mb-10 p-6 rounded-2xl
+            bg-white/70
+            border border-white/80
+            shadow-inner
+          "
         >
-          <h2 className="text-gray-700 font-semibold mb-4 text-center tracking-wide">
+          <h2 className="text-gray-700 font-semibold mb-4 text-center">
             Upload Documentation
           </h2>
 
+          {/* Hidden file input */}
           <input
+            ref={fileInputRef}
             type="file"
-            accept=".txt,.pdf,.json"
+            accept=".txt,.json"
+            hidden
             onChange={(e) => {
-              if (e.target.files) setFile(e.target.files[0]);
+              if (e.target.files) {
+                setFile(e.target.files[0]);
+                setUploadStatus(`Selected file: ${e.target.files[0].name}`);
+              }
             }}
-            className="w-full text-sm text-gray-600 mb-4"
           />
 
           <button
-            onClick={handleUpload}
+            onClick={() => fileInputRef.current?.click()}
             className="
               w-full
               py-2
@@ -159,8 +168,27 @@ export default function HomePage() {
               transition
             "
           >
-            Upload Document
+            {file ? "Change Document" : "Upload Document"}
           </button>
+
+          {file && (
+            <button
+              onClick={handleUpload}
+              className="
+                mt-3
+                w-full
+                py-2
+                rounded-xl
+                bg-gray-700
+                text-white
+                font-medium
+                hover:bg-gray-800
+                transition
+              "
+            >
+              Confirm Upload
+            </button>
+          )}
 
           {uploadStatus && (
             <p className="mt-3 text-sm text-center text-gray-600">
@@ -170,10 +198,6 @@ export default function HomePage() {
         </div>
 
         {/* Chat Section */}
-        <p className="text-center text-gray-600 mb-4 tracking-wide">
-          Ask questions grounded in your uploaded knowledge.
-        </p>
-
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -187,8 +211,6 @@ export default function HomePage() {
             border border-white/80
             shadow-inner
             focus:outline-none
-            focus:ring-2
-            focus:ring-white
             resize-none
             text-gray-700
           "
@@ -220,18 +242,20 @@ export default function HomePage() {
         )}
 
         {response && (
-          <div className="
-            mt-8
-            p-6
-            rounded-2xl
-            bg-white/70
-            border border-white/80
-            shadow-inner
-          ">
+          <div
+            className="
+              mt-8
+              p-6
+              rounded-2xl
+              bg-white/70
+              border border-white/80
+              shadow-inner
+            "
+          >
             <h2 className="font-semibold mb-3 text-gray-700">
               ✦ Response ✦
             </h2>
-            <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+            <p className="whitespace-pre-wrap text-gray-700">
               {response}
             </p>
           </div>
