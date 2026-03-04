@@ -1,13 +1,22 @@
 export function chunkText(
   text: string,
-  chunkSize = 500,
-  overlap = 50
+  maxLength = 500
 ) {
+
+   const paragraphs = text.split(/\n\s*\n/); // split by paragraphs
   const chunks: string[] = [];
 
-  for (let i = 0; i < text.length; i += chunkSize - overlap) {
-    chunks.push(text.slice(i, i + chunkSize));
+  let currentChunk = "";
+
+  for (const para of paragraphs) {
+    if ((currentChunk + para).length > maxLength) {
+      chunks.push(currentChunk.trim());
+      currentChunk = para;
+    } else {
+      currentChunk += "\n\n" + para;
+    }
   }
+if (currentChunk) chunks.push(currentChunk.trim());
 
   return chunks;
 }

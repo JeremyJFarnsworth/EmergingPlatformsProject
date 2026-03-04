@@ -37,24 +37,26 @@ export async function POST(req: Request) {
     const chunks = chunkText(text);
 
     // 3️⃣ Embed + upsert
-    const vectors: PineconeRecord[] = [];
+    const embeddings = await createEmbedding(chunks);
 
-    for (let i = 0; i < chunks.length; i++) {
-      const embedding = await createEmbedding(chunks[i]);
+const vectors = chunks.map((chunk, i) => ({
+  id: `${file.name}-${i}`,
+  values: embeddings[i],
+  metadata: {
+    text: chunk,
+    source: file.name,
+  },
+}));
 
-      vectors.push({
-        id: `${file.name}-${i}`,
-        values: embedding,
-        metadata: {
-          text: chunks[i],
-          source: file.name,
-        },
-      });
-    }
+const batchSize = 100;
 
-    await pineconeIndex.upsert({
-      records: vectors,
-});
+for (let i = 0; i < vectors.length; i += batchSize) {
+  const batch = vectors.slice(i, i + batchSize);
+
+  await pineconeIndex.upsert({
+    records: batch,
+  });
+}
 
     return NextResponse.json({
       success: true,

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
       const queryResponse = await pineconeIndex.query({
         vector: queryEmbedding,
-        topK: 5,
+        topK: 20,
         includeMetadata: true,
       });
 

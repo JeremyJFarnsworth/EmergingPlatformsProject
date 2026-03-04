@@ -1,18 +1,13 @@
-// lib/embeddings.ts
-export async function createEmbedding(text: string): Promise<number[]> {
+export async function createEmbedding(texts: string[]): Promise<number[][]> {
   const res = await fetch("http://localhost:1234/v1/embeddings", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "text-embedding-nomic-embed-text-v1.5", 
-      input: text,
+      model: "text-embedding-nomic-embed-text-v1.5",
+      input: texts,
     }),
   });
 
-  if (!res.ok) {
-    throw new Error("Embedding failed");
-  }
-
   const data = await res.json();
-  return data.data[0].embedding;
+  return data.data.map((d: any) => d.embedding);
 }
