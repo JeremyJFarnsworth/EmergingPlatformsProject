@@ -1,3 +1,53 @@
+Install outside dependencies
+LM Studio: https://lmstudio.ai
+Install the app
+Download the Model: LM Gemma 3 4b
+Download the model: Nomic Embed Text v1.5
+Go to the developer panel in the side bar
+Load both models
+Start the server
+
+Pinecone: https://www.pinecone.io
+Push the Start Building Button
+Login/create account
+COPY THE API KEY IT GIVES YOU
+create an index
+Copy index name
+Copy index host
+
+git clone https://github.com/JeremyJFarnsworth/EmergingPlatformsProject
+
+npm install
+
+create a .env file that holds api key, index name, index host formatted like:
+PINECONE_API_KEY=
+PINECONE_INDEX_NAME=
+PINECONE_INDEX_HOST=
+
+npm run dev
+
+if you get this error:
+Error [PineconeBadRequestError]: Forbidden
+at async POST (app\api\upload\route.ts:56:3)
+54 | const batch = vectors.slice(i, i + batchSize);
+55 |
+
+> 56 | await pineconeIndex.upsert({
+
+     |   ^
+
+57 | records: batch,
+58 | });
+59 | } {
+cause: undefined
+
+first double check your api key,
+then if it still isn't working. you can add it here
+replace process.env.PINECONE_API_KEY! with "YOUR_API_KEY"
+const pinecone = new Pinecone({
+apiKey: process.env.PINECONE_API_KEY!, // 🔴 REQUIRED
+});
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
