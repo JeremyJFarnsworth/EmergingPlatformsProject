@@ -11,7 +11,7 @@ Pinecone: https://www.pinecone.io
 Push the Start Building Button
 Login/create account
 COPY THE API KEY IT GIVES YOU
-create an index
+create an index - The demension value needs to be set to 768
 Copy index name
 Copy index host
 
